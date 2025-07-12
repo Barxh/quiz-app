@@ -1,6 +1,9 @@
 package com.example.quizapp.presentation.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,13 +16,16 @@ import com.example.quizapp.presentation.quiz.QuizScreen
 import com.example.quizapp.presentation.quiz.QuizState
 import com.example.quizapp.presentation.result.ResultScreen
 import com.example.quizapp.presentation.result.ResultState
+import java.nio.file.WatchEvent
 
 @Composable
 fun NavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    paddingValues: PaddingValues
 ) {
 
     NavHost(
+        modifier = Modifier.padding(paddingValues),
         navController = navController,
         startDestination = Route.DashboardScreen
     ) {
