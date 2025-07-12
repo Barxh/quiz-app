@@ -27,39 +27,62 @@ import androidx.navigation.navOptions
 import com.example.quizapp.domain.model.QuizQuestion
 import com.example.quizapp.domain.model.UserAnswer
 import com.example.quizapp.presentation.common_component.ErrorScreen
+import com.example.quizapp.presentation.quiz.component.ExitQuizDialog
+import com.example.quizapp.presentation.quiz.component.QuizScreenLoadingContent
 import com.example.quizapp.presentation.quiz.component.QuizScreenTopBar
 import com.example.quizapp.presentation.quiz.component.QuizSubmitButtons
+import com.example.quizapp.presentation.quiz.component.SubmitQuizDialog
 
 @Composable
 fun QuizScreen(state: QuizState) {
+
+    SubmitQuizDialog(
+        onDialogDismiss = {},
+        onConfirmButtonClick = {},
+        isOpen = state.isSubmitDialogOpen
+    )
+    ExitQuizDialog(
+        onDialogDismiss = {},
+        onConfirmButtonClick = {},
+        isOpen = state.isExitDialogOpen
+    )
+    
     Column(modifier = Modifier.fillMaxSize()) {
         QuizScreenTopBar(
             title = state.topBarTitle,
             onExitQuizButtonClick = {}
         )
-        when {
-            state.errorMessage != null ->
-                ErrorScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    errorMessage = state.errorMessage,
-                    onRefreshIconClick = {}
-                )
+        if (state.isLoading) {
+            QuizScreenLoadingContent(
+                modifier = Modifier.fillMaxSize(),
+                loadingMessage = state.loadingMessage
+            )
+        } else {
+            when {
+                state.errorMessage != null ->
+                    ErrorScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        errorMessage = state.errorMessage,
+                        onRefreshIconClick = {}
+                    )
 
-            state.question.isEmpty() ->
-                ErrorScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    errorMessage = "No Quiz Question Available",
-                    onRefreshIconClick = {}
-                )
+                state.question.isEmpty() ->
+                    ErrorScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        errorMessage = "No Quiz Question Available",
+                        onRefreshIconClick = {}
+                    )
 
-            else -> {
+                else -> {
 
-                QuizScreenContent(
-                    state = state
-                )
+                    QuizScreenContent(
+                        state = state
+                    )
 
+                }
             }
         }
+
 
     }
 }

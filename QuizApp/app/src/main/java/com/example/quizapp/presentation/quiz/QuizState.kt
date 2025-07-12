@@ -8,5 +8,9 @@ data class QuizState(
     val answers: List<UserAnswer> = emptyList(),
     val currentQuestionIndex: Int = 0,
     val errorMessage: String? =null,
-    val topBarTitle : String = "Quiz"
+    val isLoading: Boolean = false,
+    val loadingMessage: String? =null,
+    val topBarTitle : String = "Quiz",
+    val isSubmitDialogOpen : Boolean = false,
+    val isExitDialogOpen : Boolean = false,
 )
