@@ -43,6 +43,7 @@ android {
     room {
         schemaDirectory("$projectDir/schemas")
     }
+
 }
 
 dependencies {
