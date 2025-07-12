@@ -1,7 +1,7 @@
-package com.example.quizapp.presentation.quiz.component
+package com.example.quizapp.presentation.issue_report.component
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,22 +12,22 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizScreenTopBar(
+fun IssueReportScreenTopBar(
     modifier: Modifier = Modifier,
     title: String,
-    onExitQuizButtonClick: () -> Unit
+    onBackButtonClick: () -> Unit
 
 ) {
     TopAppBar(
         modifier = modifier,
         title = { Text(text = title) },
-        actions = {
+        navigationIcon = {
             IconButton(
-                onClick = onExitQuizButtonClick
+                onClick = onBackButtonClick
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Exit Quiz"
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = "Navigate back"
                 )
             }
         }
