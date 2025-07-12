@@ -5,6 +5,6 @@ data class QuizQuestion(
     val topicCode: Int,
     val question: String,
     val allOptions: List<String>,
-    val correctAnswers: String,
+    val correctAnswer: String,
     val explanation: String
 )
