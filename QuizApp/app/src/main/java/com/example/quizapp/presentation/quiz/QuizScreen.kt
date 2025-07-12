@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.navOptions
 import com.example.quizapp.domain.model.QuizQuestion
 import com.example.quizapp.domain.model.UserAnswer
 import com.example.quizapp.presentation.common_component.ErrorScreen
@@ -39,7 +37,9 @@ import com.example.quizapp.presentation.quiz.component.QuizSubmitButtons
 import com.example.quizapp.presentation.quiz.component.SubmitQuizDialog
 
 @Composable
-fun QuizScreen(state: QuizState) {
+fun QuizScreen(
+    state: QuizState, navigateToDashboardScreen: () -> Unit, navigateToResultScreen: () -> Unit
+) {
 
     SubmitQuizDialog(
         onDialogDismiss = {},
@@ -47,41 +47,34 @@ fun QuizScreen(state: QuizState) {
         isOpen = state.isSubmitDialogOpen
     )
     ExitQuizDialog(
-        onDialogDismiss = {},
-        onConfirmButtonClick = {},
-        isOpen = state.isExitDialogOpen
+        onDialogDismiss = {}, onConfirmButtonClick = {}, isOpen = state.isExitDialogOpen
     )
-    
+
     Column(modifier = Modifier.fillMaxSize()) {
         QuizScreenTopBar(
-            title = state.topBarTitle,
-            onExitQuizButtonClick = {}
+            title = state.topBarTitle, onExitQuizButtonClick = navigateToDashboardScreen
         )
         if (state.isLoading) {
             QuizScreenLoadingContent(
-                modifier = Modifier.fillMaxSize(),
-                loadingMessage = state.loadingMessage
+                modifier = Modifier.fillMaxSize(), loadingMessage = state.loadingMessage
             )
         } else {
             when {
-                state.errorMessage != null ->
-                    ErrorScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        errorMessage = state.errorMessage,
-                        onRefreshIconClick = {}
-                    )
+                state.errorMessage != null -> ErrorScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    errorMessage = state.errorMessage,
+                    onRefreshIconClick = {})
 
-                state.question.isEmpty() ->
-                    ErrorScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        errorMessage = "No Quiz Question Available",
-                        onRefreshIconClick = {}
-                    )
+                state.question.isEmpty() -> ErrorScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    errorMessage = "No Quiz Question Available",
+                    onRefreshIconClick = {})
 
                 else -> {
 
                     QuizScreenContent(
-                        state = state
+                        state = state,
+                        onSubmitButtonClick = navigateToResultScreen
                     )
 
                 }
@@ -93,7 +86,9 @@ fun QuizScreen(state: QuizState) {
 }
 
 @Composable
-fun QuizScreenContent(modifier: Modifier = Modifier, state: QuizState) {
+fun QuizScreenContent(
+    modifier: Modifier = Modifier, state: QuizState, onSubmitButtonClick: () -> Unit
+) {
     Column(modifier = modifier.fillMaxSize()) {
         QuestionNavigationRow(
             questions = state.question,
@@ -101,8 +96,7 @@ fun QuizScreenContent(modifier: Modifier = Modifier, state: QuizState) {
             answer = state.answers,
             onTabSelected = {
 
-            }
-        )
+            })
         Spacer(modifier = Modifier.height(20.dp))
         QuestionItem(
             modifier = Modifier
@@ -114,8 +108,7 @@ fun QuizScreenContent(modifier: Modifier = Modifier, state: QuizState) {
             answers = state.answers,
             onOptionSelected = { _, _ ->
 
-            }
-        )
+            })
         QuizSubmitButtons(
             modifier = Modifier
                 .fillMaxWidth()
@@ -124,7 +117,7 @@ fun QuizScreenContent(modifier: Modifier = Modifier, state: QuizState) {
             isNextButtonEnable = state.currentQuestionIndex != state.question.lastIndex,
             onPreviousButtonClick = {},
             onNextButtonClick = {},
-            onSubmitButtonClick = {}
+            onSubmitButtonClick = onSubmitButtonClick
         )
     }
 
@@ -139,9 +132,7 @@ private fun QuestionNavigationRow(
     onTabSelected: (Int) -> Unit
 ) {
     ScrollableTabRow(
-        modifier = modifier,
-        selectedTabIndex = currentQuestionIndex,
-        edgePadding = 0.dp
+        modifier = modifier, selectedTabIndex = currentQuestionIndex, edgePadding = 0.dp
     ) {
         questions.forEachIndexed { index, quizQuestion ->
             val containerColor = when {
@@ -154,11 +145,9 @@ private fun QuestionNavigationRow(
             Tab(
                 modifier = Modifier.background(containerColor),
                 selected = currentQuestionIndex == index,
-                onClick = { onTabSelected(index) }
-            ) {
+                onClick = { onTabSelected(index) }) {
                 Text(
-                    modifier = Modifier.padding(vertical = 10.dp),
-                    text = "${index + 1}"
+                    modifier = Modifier.padding(vertical = 10.dp), text = "${index + 1}"
                 )
             }
 
@@ -180,8 +169,7 @@ private fun QuestionItem(
         val question = questions[currentQuestionIndex]
         val selectedAnswer = answers.find { it.questionId == question.id }?.selectedOption
         Text(
-            text = question.question,
-            style = MaterialTheme.typography.headlineSmall
+            text = question.question, style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier.height(10.dp))
@@ -195,8 +183,7 @@ private fun QuestionItem(
                     isSelected = option == selectedAnswer,
                     onClick = {
                         onOptionSelected(question.id, option)
-                    }
-                )
+                    })
             }
         }
 
@@ -205,37 +192,28 @@ private fun QuestionItem(
 
 @Composable
 fun OptionItem(
-    modifier: Modifier = Modifier,
-    option: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier, option: String, isSelected: Boolean, onClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier
-            .clickable {
-                onClick()
-            }
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-                shape = MaterialTheme.shapes.small
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else MaterialTheme.colorScheme.surface
-        )
-    ) {
+    Card(modifier = modifier
+        .clickable {
+            onClick()
+        }
+        .border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary,
+            shape = MaterialTheme.shapes.small
+        ), colors = CardDefaults.cardColors(
+        containerColor = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else MaterialTheme.colorScheme.surface
+    )) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
-                selected = isSelected,
-                onClick = { onClick() }
-            )
+                selected = isSelected, onClick = { onClick() })
             Text(
-                text = option,
-                style = MaterialTheme.typography.bodyLarge
+                text = option, style = MaterialTheme.typography.bodyLarge
             )
         }
     }

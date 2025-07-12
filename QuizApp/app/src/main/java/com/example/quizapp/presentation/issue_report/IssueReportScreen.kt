@@ -27,13 +27,14 @@ import com.example.quizapp.presentation.issue_report.component.QuestionCard
 
 
 @Composable
-fun IssueReportScreen(modifier: Modifier = Modifier, state: IssueReportState) {
-    Column(modifier = modifier.fillMaxSize()) {
+fun IssueReportScreen(
+    state: IssueReportState,
+    onBackButtonClick: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
         IssueReportScreenTopBar(
-            title = "Report an Issue",
-            onBackButtonClick = {}
-        )
+            title = "Report an Issue", onBackButtonClick = onBackButtonClick)
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -44,16 +45,14 @@ fun IssueReportScreen(modifier: Modifier = Modifier, state: IssueReportState) {
             QuestionCard(
                 question = state.quizQuestion,
                 isCardExpanded = state.isQuestionCardExpanded,
-                onExpandClick = {}
-            )
-            Spacer(modifier.height(10.dp))
+                onExpandClick = {})
+            Spacer(Modifier.height(10.dp))
             IssueTypeSection(
                 selectedIssueType = state.issueType,
                 otherIssueText = state.otherIssueText,
                 onOtherIssueTextChange = {},
-                onIssueTypeClick = {}
-            )
-            Spacer(modifier.height(10.dp))
+                onIssueTypeClick = {})
+            Spacer(Modifier.height(10.dp))
 
             OutlinedTextField(
                 modifier = Modifier
@@ -64,9 +63,8 @@ fun IssueReportScreen(modifier: Modifier = Modifier, state: IssueReportState) {
                 label = {
                     Text(text = "Additional Comment")
                 },
-                supportingText = { Text(text = "Describe the issue in more detail. (Optional)") }
-            )
-            Spacer(modifier.height(10.dp))
+                supportingText = { Text(text = "Describe the issue in more detail. (Optional)") })
+            Spacer(Modifier.height(10.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.emailForFollowUp,
@@ -83,12 +81,9 @@ fun IssueReportScreen(modifier: Modifier = Modifier, state: IssueReportState) {
         Button(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(10.dp),
-            onClick = {}
-        ) {
+                .padding(10.dp), onClick = {}) {
             Text(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                text = "Submit"
+                modifier = Modifier.padding(horizontal = 10.dp), text = "Submit"
             )
         }
     }
@@ -105,8 +100,7 @@ private fun IssueTypeSection(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "ISSUE TYPE",
-            style = MaterialTheme.typography.bodySmall
+            text = "ISSUE TYPE", style = MaterialTheme.typography.bodySmall
         )
         FlowRow {
             IssueType.entries.forEach { issueType ->
@@ -118,8 +112,7 @@ private fun IssueTypeSection(
                 ) {
                     RadioButton(
                         selected = issueType == selectedIssueType,
-                        onClick = { onIssueTypeClick(issueType) }
-                    )
+                        onClick = { onIssueTypeClick(issueType) })
                     if (issueType == IssueType.OTHER) {
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),

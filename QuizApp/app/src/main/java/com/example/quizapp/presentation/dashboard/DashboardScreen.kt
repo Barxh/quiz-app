@@ -37,7 +37,8 @@ import com.example.quizapp.presentation.dashboard.component.UserStatisticsCard
 
 @Composable
 fun DashboardScreen(
-    state: DashboardState
+    state: DashboardState,
+    onTopicCardClick: (Int) -> Unit
 
 ) {
 
@@ -66,7 +67,8 @@ fun DashboardScreen(
             quizTopicList = state.quizTopics,
             isTopicLoading = state.isLoading,
             errorMessage = state.errorMessage,
-            onRefreshIconClick = {}
+            onRefreshIconClick = {},
+            onTopicCardClick = onTopicCardClick
         )
 
     }
@@ -121,7 +123,8 @@ private fun QuizTopicSection(
     quizTopicList: List<QuizTopic>,
     isTopicLoading: Boolean,
     errorMessage: String?,
-    onRefreshIconClick: () -> Unit
+    onRefreshIconClick: () -> Unit,
+    onTopicCardClick: (Int) -> Unit
 ) {
     Column(modifier = modifier) {
         Text(
@@ -164,7 +167,7 @@ private fun QuizTopicSection(
                                 .height(120.dp),
                             imageUrl = topic.imageUrl,
                             topicName = topic.name,
-                            onClick = { TODO() },
+                            onClick = { onTopicCardClick(topic.code)},
                         )
                     }
                 }
@@ -183,6 +186,7 @@ fun PreviewDashboardScreen() {
         state = DashboardState(
             questionAnswers = 10,
             correctAnswers = 7
-        )
+        ),
+        onTopicCardClick = {}
     )
 }

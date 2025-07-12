@@ -34,9 +34,13 @@ import com.example.quizapp.domain.model.UserAnswer
 import com.example.quizapp.presentation.theme.CustomGreen
 
 @Composable
-fun ResultScreen(modifier: Modifier = Modifier, state: ResultState) {
+fun ResultScreen(
+    state: ResultState,
+    onReportIconCLick: (String) -> Unit,
+    onStartNewQuiz: () -> Unit
+) {
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
 
         LazyColumn(
@@ -66,15 +70,18 @@ fun ResultScreen(modifier: Modifier = Modifier, state: ResultState) {
                 QuestionItem(
                     question = question,
                     userSelectedAnswer = userAnswer,
-                    onReportIconClick = {}
+                    onReportIconClick = {
+                        onReportIconCLick(question.id)
+                    }
                 )
             }
         }
 
         Button(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier
+                .padding(10.dp)
                 .align(Alignment.CenterHorizontally),
-            onClick = {}
+            onClick = onStartNewQuiz
         ) {
             Text(text = "Start New Quiz")
         }
@@ -157,7 +164,7 @@ private fun QuestionItem(
                 else -> ""
             }
 
-            val optionColor = when(option) {
+            val optionColor = when (option) {
                 question.correctAnswer -> CustomGreen
                 userSelectedAnswer -> MaterialTheme.colorScheme.error
                 else -> LocalContentColor.current
@@ -198,7 +205,8 @@ fun PreviewResultScreen() {
             scorePercentage = 65,
             quizQuestions = dummyQuestions,
             userAnswers = dummyAnswers
-        )
-
+        ),
+        onReportIconCLick = {},
+        onStartNewQuiz = {}
     )
 }

@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.compose.rememberNavController
 import com.example.quizapp.presentation.dashboard.DashboardScreen
 import com.example.quizapp.presentation.dashboard.DashboardState
+import com.example.quizapp.presentation.navigation.NavGraph
 import com.example.quizapp.presentation.theme.QuizAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -14,8 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             QuizAppTheme {
-                DashboardScreen(
-                    state = DashboardState(questionAnswers = 10, correctAnswers = 7)
+                val navController = rememberNavController()
+                NavGraph(
+                    navController = navController
                 )
 
 
