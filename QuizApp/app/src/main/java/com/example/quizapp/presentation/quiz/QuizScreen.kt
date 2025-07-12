@@ -26,15 +26,47 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.navOptions
 import com.example.quizapp.domain.model.QuizQuestion
 import com.example.quizapp.domain.model.UserAnswer
+import com.example.quizapp.presentation.common_component.ErrorScreen
 import com.example.quizapp.presentation.quiz.component.QuizScreenTopBar
+import com.example.quizapp.presentation.quiz.component.QuizSubmitButtons
 
 @Composable
 fun QuizScreen(state: QuizState) {
     Column(modifier = Modifier.fillMaxSize()) {
         QuizScreenTopBar(
-            title = "Android Quiz",
+            title = state.topBarTitle,
             onExitQuizButtonClick = {}
         )
+        when {
+            state.errorMessage != null ->
+                ErrorScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    errorMessage = state.errorMessage,
+                    onRefreshIconClick = {}
+                )
+
+            state.question.isEmpty() ->
+                ErrorScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    errorMessage = "No Quiz Question Available",
+                    onRefreshIconClick = {}
+                )
+
+            else -> {
+
+                QuizScreenContent(
+                    state = state
+                )
+
+            }
+        }
+
+    }
+}
+
+@Composable
+fun QuizScreenContent(modifier: Modifier = Modifier, state: QuizState) {
+    Column(modifier = modifier.fillMaxSize()) {
         QuestionNavigationRow(
             questions = state.question,
             currentQuestionIndex = state.currentQuestionIndex,
@@ -46,6 +78,7 @@ fun QuizScreen(state: QuizState) {
         Spacer(modifier = Modifier.height(20.dp))
         QuestionItem(
             modifier = Modifier
+                .weight(1f)
                 .padding(15.dp)
                 .verticalScroll(rememberScrollState()),
             questions = state.question,
@@ -55,7 +88,18 @@ fun QuizScreen(state: QuizState) {
 
             }
         )
+        QuizSubmitButtons(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            isPreviousButtonEnable = state.currentQuestionIndex != 0,
+            isNextButtonEnable = state.currentQuestionIndex != state.question.lastIndex,
+            onPreviousButtonClick = {},
+            onNextButtonClick = {},
+            onSubmitButtonClick = {}
+        )
     }
+
 }
 
 @Composable
