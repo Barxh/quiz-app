@@ -14,6 +14,7 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.bson.types.ObjectId
 
 class QuizQuestionRepositoryImpl(
     mongoDatabase: MongoDatabase
@@ -26,7 +27,7 @@ class QuizQuestionRepositoryImpl(
             if(question.id == null){
                 questionCollection.insertOne(question.toQuizQuestionEntity())
             }else{
-                val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, question.id)
+                val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, ObjectId(question.id))
 
                 val updateQuery = Updates.combine(
                     Updates.set(QuizQuestionEntity::question.name, question.question),
@@ -81,7 +82,7 @@ class QuizQuestionRepositoryImpl(
         }
         return try {
             val filterQuery = Filters.eq(
-                QuizQuestionEntity::_id.name, id
+                QuizQuestionEntity::_id.name, ObjectId(id)
             )
             val questionEntity = questionCollection
                 .find(filterQuery)
@@ -102,7 +103,7 @@ class QuizQuestionRepositoryImpl(
             return Result.Failure(DataError.Validation)
         }
         return try{
-            val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, id)
+            val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, ObjectId(id))
             val deleteResult = questionCollection.deleteOne(filterQuery)
             if(deleteResult.deletedCount > 0){
                 Result.Success(Unit)

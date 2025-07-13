@@ -4,7 +4,7 @@ import com.example.data.database.entity.QuizQuestionEntity
 import com.example.domain.model.QuizQuestion
 
 fun QuizQuestionEntity.toQuizQuestion() = QuizQuestion(
-    id = _id,
+    id = _id.toHexString(),
     question = question,
     correctAnswer = correctAnswer,
     incorrectAnswers = incorrectAnswers,
