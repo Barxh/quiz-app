@@ -1,5 +1,6 @@
 package com.example.quizapp.data.remote
 
+import com.example.quizapp.data.dto.QuizQuestionDto
 import com.example.quizapp.data.dto.QuizTopicDto
 import com.example.quizapp.data.util.Constant.BASE_URL
 import io.ktor.client.HttpClient
@@ -14,6 +15,16 @@ class KtorRemoteDataSource(
         return try {
             val response = httpClient.get(urlString = "$BASE_URL/quiz/topics")
             response.body<List<QuizTopicDto>>()
+        }catch (e: Exception){
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getQuizQuestions(): List<QuizQuestionDto>? {
+        return try {
+            val response = httpClient.get(urlString = "$BASE_URL/quiz/questions")
+            response.body<List<QuizQuestionDto>>()
         }catch (e: Exception){
             e.printStackTrace()
             null
