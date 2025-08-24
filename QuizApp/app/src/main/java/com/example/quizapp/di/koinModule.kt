@@ -1,5 +1,7 @@
 package com.example.quizapp.di
 
+import com.example.quizapp.data.local.DatabaseFactory
+import com.example.quizapp.data.local.QuizDatabase
 import com.example.quizapp.data.remote.HttpClientFactory
 import com.example.quizapp.data.remote.KtorRemoteDataSource
 import com.example.quizapp.data.remote.RemoteQuizDataSource
@@ -17,6 +19,9 @@ import org.koin.dsl.module
 val koinModule = module{
     single { HttpClientFactory.create() }
     singleOf(::KtorRemoteDataSource).bind<RemoteQuizDataSource>()
+
+    single{ DatabaseFactory.create(get()) }
+    single{ get<QuizDatabase>().quizTopicDao()}
 
     singleOf(::QuizQuestionRepositoryImpl).bind<QuizQuestionRepository>()
     singleOf(::QuizTopicRepositoryImpl).bind<QuizTopicRepository>()
