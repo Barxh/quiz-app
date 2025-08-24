@@ -29,7 +29,7 @@ class QuizQuestionRepositoryImpl(
             if(question.id == null){
                 questionCollection.insertOne(question.toQuizQuestionEntity())
             }else{
-                val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, ObjectId(question.id))
+                val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, question.id)
 
                 val updateQuery = Updates.combine(
                     Updates.set(QuizQuestionEntity::question.name, question.question),
@@ -57,13 +57,12 @@ class QuizQuestionRepositoryImpl(
     ): Result<List<QuizQuestion>, DataError>{
         return try {
             val questionLimit = limit?.takeIf { it > 0} ?: 10
-            val pipeline = mutableListOf<Bson>()
-            topicCode?.let {
-                pipeline += Aggregates.match(Filters.eq(QuizQuestionEntity::topicCode.name, it))
-            }
-            pipeline += Aggregates.sample(questionLimit)
+            val filterQuery = topicCode?.let {
+                Filters.eq(QuizQuestionEntity::topicCode.name, it)
+            }?: Filters.empty()
             val questions = questionCollection
-                .aggregate(pipeline)
+                .find(filter = filterQuery)
+                .limit(questionLimit)
                 .map {
                     it.toQuizQuestion()
                 }.toList()
@@ -85,7 +84,7 @@ class QuizQuestionRepositoryImpl(
         }
         return try {
             val filterQuery = Filters.eq(
-                QuizQuestionEntity::_id.name, ObjectId(id)
+                QuizQuestionEntity::_id.name, id
             )
             val questionEntity = questionCollection
                 .find(filterQuery)
@@ -106,7 +105,7 @@ class QuizQuestionRepositoryImpl(
             return Result.Failure(DataError.Validation)
         }
         return try{
-            val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, ObjectId(id))
+            val filterQuery = Filters.eq(QuizQuestionEntity::_id.name, id)
             val deleteResult = questionCollection.deleteOne(filterQuery)
             if(deleteResult.deletedCount > 0){
                 Result.Success(Unit)
