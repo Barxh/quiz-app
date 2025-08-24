@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -24,6 +26,8 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -38,7 +42,10 @@ import com.example.quizapp.presentation.quiz.component.SubmitQuizDialog
 
 @Composable
 fun QuizScreen(
-    state: QuizState, navigateToDashboardScreen: () -> Unit, navigateToResultScreen: () -> Unit
+    state: QuizState,
+    navigateToDashboardScreen: () -> Unit,
+    navigateToResultScreen: () -> Unit,
+    onAction: (QuizAction) -> Unit
 ) {
 
     SubmitQuizDialog(
@@ -74,7 +81,8 @@ fun QuizScreen(
 
                     QuizScreenContent(
                         state = state,
-                        onSubmitButtonClick = navigateToResultScreen
+                        onSubmitButtonClick = navigateToResultScreen,
+                        onAction = onAction
                     )
 
                 }
@@ -87,36 +95,62 @@ fun QuizScreen(
 
 @Composable
 fun QuizScreenContent(
-    modifier: Modifier = Modifier, state: QuizState, onSubmitButtonClick: () -> Unit
+    modifier: Modifier = Modifier,
+    state: QuizState,
+    onSubmitButtonClick: () -> Unit,
+    onAction: (QuizAction) -> Unit
 ) {
+
+    val pagerState = rememberPagerState(
+        pageCount = {
+            state.question.size
+        }
+    )
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { pageIndex ->
+            onAction(QuizAction.JumpToQuestion(pageIndex))
+        }
+    }
+    LaunchedEffect(state.currentQuestionIndex) {
+        pagerState.animateScrollToPage(state.currentQuestionIndex)
+    }
     Column(modifier = modifier.fillMaxSize()) {
         QuestionNavigationRow(
             questions = state.question,
             currentQuestionIndex = state.currentQuestionIndex,
             answer = state.answers,
-            onTabSelected = {
-
+            onTabSelected = { index ->
+                onAction(QuizAction.JumpToQuestion(index))
             })
         Spacer(modifier = Modifier.height(20.dp))
-        QuestionItem(
-            modifier = Modifier
-                .weight(1f)
-                .padding(15.dp)
-                .verticalScroll(rememberScrollState()),
-            questions = state.question,
-            currentQuestionIndex = state.currentQuestionIndex,
-            answers = state.answers,
-            onOptionSelected = { _, _ ->
 
-            })
+        HorizontalPager(
+            modifier = Modifier.weight(1f),
+            state = pagerState
+        ) {
+            QuestionItem(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(15.dp)
+                    .verticalScroll(rememberScrollState()),
+                questions = state.question,
+                currentQuestionIndex = state.currentQuestionIndex,
+                answers = state.answers,
+                onOptionSelected = { questionId, option ->
+
+                    onAction(QuizAction.OnOptionSelected(questionId, option))
+                }
+            )
+        }
+
         QuizSubmitButtons(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
             isPreviousButtonEnable = state.currentQuestionIndex != 0,
             isNextButtonEnable = state.currentQuestionIndex != state.question.lastIndex,
-            onPreviousButtonClick = {},
-            onNextButtonClick = {},
+            onPreviousButtonClick = { onAction(QuizAction.PrevQuestionButtonClick) },
+            onNextButtonClick = { onAction(QuizAction.NextQuestionButtonClick) },
             onSubmitButtonClick = onSubmitButtonClick
         )
     }
@@ -172,7 +206,7 @@ private fun QuestionItem(
             text = question.question, style = MaterialTheme.typography.headlineSmall
         )
 
-        Spacer(modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             question.allOptions.forEach { option ->
                 OptionItem(
@@ -183,7 +217,8 @@ private fun QuestionItem(
                     isSelected = option == selectedAnswer,
                     onClick = {
                         onOptionSelected(question.id, option)
-                    })
+                    }
+                )
             }
         }
 

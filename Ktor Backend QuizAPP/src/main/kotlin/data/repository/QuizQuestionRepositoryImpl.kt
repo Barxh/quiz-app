@@ -8,12 +8,14 @@ import com.example.domain.model.QuizQuestion
 import com.example.domain.repository.QuizQuestionRepository
 import com.example.domain.util.DataError
 import com.example.domain.util.Result
+import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
 class QuizQuestionRepositoryImpl(
@@ -55,12 +57,13 @@ class QuizQuestionRepositoryImpl(
     ): Result<List<QuizQuestion>, DataError>{
         return try {
             val questionLimit = limit?.takeIf { it > 0} ?: 10
-            val filterQuery = topicCode?.let {
-                Filters.eq(QuizQuestionEntity::topicCode.name, it)
-            }?: Filters.empty()
+            val pipeline = mutableListOf<Bson>()
+            topicCode?.let {
+                pipeline += Aggregates.match(Filters.eq(QuizQuestionEntity::topicCode.name, it))
+            }
+            pipeline += Aggregates.sample(questionLimit)
             val questions = questionCollection
-                .find(filter = filterQuery)
-                .limit(questionLimit)
+                .aggregate(pipeline)
                 .map {
                     it.toQuizQuestion()
                 }.toList()
