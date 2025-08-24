@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(private val topicRepository: QuizTopicRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
     val state = _state.asStateFlow()
 
-    val quizTopicRepository: QuizTopicRepository = QuizTopicRepositoryImpl()
+
 
     init {
         getQuizTopics()
@@ -26,7 +26,7 @@ class DashboardViewModel : ViewModel() {
 
     private fun getQuizTopics() {
         viewModelScope.launch {
-            val quizTopic = quizTopicRepository.getQuizTopic()
+            val quizTopic = topicRepository.getQuizTopic()
             if (quizTopic != null) {
                 _state.update { it.copy(quizTopics = quizTopic) }
             }

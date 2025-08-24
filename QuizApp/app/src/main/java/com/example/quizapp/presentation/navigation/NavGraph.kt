@@ -19,6 +19,7 @@ import com.example.quizapp.presentation.quiz.QuizScreen
 import com.example.quizapp.presentation.quiz.QuizViewModel
 import com.example.quizapp.presentation.result.ResultScreen
 import com.example.quizapp.presentation.result.ResultState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NavGraph(
@@ -32,7 +33,7 @@ fun NavGraph(
         startDestination = Route.DashboardScreen
     ) {
         composable<Route.DashboardScreen> {
-            val viewModel = viewModel<DashboardViewModel>()
+            val viewModel = koinViewModel<DashboardViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             DashboardScreen(
@@ -44,7 +45,7 @@ fun NavGraph(
         }
         composable<Route.QuizScreen> {
             val topicCode = it.toRoute<Route.QuizScreen>().topicCode
-            val viewModel = viewModel<QuizViewModel>()
+            val viewModel = koinViewModel<QuizViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             QuizScreen(
                 state = state,
