@@ -1,10 +1,10 @@
 package com.example.quizapp.data.repository
 
 import com.example.quizapp.data.local.dao.QuizTopicDao
+import com.example.quizapp.data.mapper.toQuizTopic
 import com.example.quizapp.data.mapper.toQuizTopics
 import com.example.quizapp.data.mapper.toQuizTopicsEntities
 import com.example.quizapp.data.remote.RemoteQuizDataSource
-import com.example.quizapp.data.remote.dto.QuizTopicDto
 import com.example.quizapp.domain.model.QuizTopic
 import com.example.quizapp.domain.repository.QuizTopicRepository
 import com.example.quizapp.domain.util.DataError
@@ -30,11 +30,8 @@ class QuizTopicRepositoryImpl(
                 val quizTopicDto = result.data
                 topicDao.clearAllQuizTopics()
                 topicDao.insertQuizTopics(quizTopicDto.toQuizTopicsEntities())
-                quizTopicDto.toQuizTopics()
-                Result.Success(quizTopicDto.toQuizTopics())
+                Result.Success(quizTopicDto.toQuizTopic())
             }
         }
-
-
     }
 }

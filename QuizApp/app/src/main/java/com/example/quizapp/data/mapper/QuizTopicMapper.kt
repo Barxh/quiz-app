@@ -17,12 +17,12 @@ fun QuizTopicDto.toQuizTopicEntity() = QuizTopicEntity(
     imageUrl = BASE_URL + imageUrl,
     code = code
 )
-fun QuizTopicEntity.toQuizTopic() = QuizTopic(
+fun QuizTopicEntity.toQuizTopics() = QuizTopic(
     id = id,
     name = name,
     imageUrl = imageUrl,
     code = code
 )
-fun List<QuizTopicDto>.toQuizTopics() = map { it.toQuizTopic() }
+fun List<QuizTopicDto>.toQuizTopic() = map { it.toQuizTopic() }
 fun List<QuizTopicDto>.toQuizTopicsEntities() = map { it.toQuizTopicEntity() }
-fun List<QuizTopicEntity>.toQuizTopics() = map { it.toQuizTopic() }
+fun List<QuizTopicEntity>.toQuizTopics() = map { it.toQuizTopics() }
