@@ -1,6 +1,6 @@
 package com.example.quizapp.data.mapper
 
-import com.example.quizapp.data.dto.QuizQuestionDto
+import com.example.quizapp.data.remote.dto.QuizQuestionDto
 import com.example.quizapp.domain.model.QuizQuestion
 
 fun QuizQuestionDto.toQuizQuestion() = QuizQuestion(

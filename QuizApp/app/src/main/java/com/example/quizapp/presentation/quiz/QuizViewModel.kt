@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quizapp.domain.model.UserAnswer
 import com.example.quizapp.domain.repository.QuizQuestionRepository
+import com.example.quizapp.domain.util.DataError
+import com.example.quizapp.domain.util.onFailure
+import com.example.quizapp.domain.util.onSuccess
+import com.example.quizapp.presentation.util.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -52,10 +56,23 @@ class QuizViewModel(
     }
     private fun getQuizQuestions(){
         viewModelScope.launch {
-            val quizQuestions = questionRepository.getQuizQuestions()
-            if(quizQuestions != null){
-                _state.update { it.copy(question = quizQuestions) }
-            }
+            _state.update { it.copy(isLoading = true) }
+            questionRepository.getQuizQuestions()
+                .onSuccess { quizQuestions ->
+                    _state.update { it.copy(
+                        question = quizQuestions,
+                        errorMessage = null,
+                        isLoading = false
+                    ) }
+                }.onFailure { error ->
+
+                    val errorMessage = error.getErrorMessage()
+                    _state.update { it.copy(
+                        question = emptyList(),
+                        errorMessage = errorMessage,
+                        isLoading = false
+                    ) }
+                }
 
         }
     }

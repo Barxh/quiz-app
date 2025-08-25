@@ -1,6 +1,6 @@
 package com.example.quizapp.data.mapper
 
-import com.example.quizapp.data.dto.QuizTopicDto
+import com.example.quizapp.data.remote.dto.QuizTopicDto
 import com.example.quizapp.data.local.entity.QuizTopicEntity
 import com.example.quizapp.data.util.Constant.BASE_URL
 import com.example.quizapp.domain.model.QuizTopic

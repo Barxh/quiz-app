@@ -2,11 +2,11 @@ package com.example.quizapp.presentation.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quizapp.data.mapper.toQuizTopics
-import com.example.quizapp.data.remote.HttpClientFactory
-import com.example.quizapp.data.remote.KtorRemoteDataSource
-import com.example.quizapp.data.repository.QuizTopicRepositoryImpl
 import com.example.quizapp.domain.repository.QuizTopicRepository
+import com.example.quizapp.domain.util.DataError
+import com.example.quizapp.domain.util.onFailure
+import com.example.quizapp.domain.util.onSuccess
+import com.example.quizapp.presentation.util.getErrorMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +18,6 @@ class DashboardViewModel(private val topicRepository: QuizTopicRepository) : Vie
     val state = _state.asStateFlow()
 
 
-
     init {
         getQuizTopics()
     }
@@ -26,10 +25,23 @@ class DashboardViewModel(private val topicRepository: QuizTopicRepository) : Vie
 
     private fun getQuizTopics() {
         viewModelScope.launch {
-            val quizTopic = topicRepository.getQuizTopic()
-            if (quizTopic != null) {
-                _state.update { it.copy(quizTopics = quizTopic) }
-            }
+            _state.update { it.copy(isLoading = true) }
+            topicRepository.getQuizTopic()
+                .onSuccess { topics ->
+                    _state.update { it.copy(
+                        quizTopics = topics,
+                        errorMessage = null,
+                        isLoading = false
+                    ) }
+
+                }.onFailure { error ->
+                    val errorMessage = error.getErrorMessage()
+                    _state.update { it.copy(
+                        quizTopics = emptyList(),
+                        errorMessage = errorMessage,
+                        isLoading = false
+                    ) }
+                }
         }
     }
 }

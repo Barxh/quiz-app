@@ -1,4 +1,4 @@
-package com.example.quizapp.data.dto
+package com.example.quizapp.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
