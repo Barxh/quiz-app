@@ -7,17 +7,22 @@ import com.example.quizapp.domain.util.DataError
 import com.example.quizapp.domain.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 
 class KtorRemoteDataSource(
     private val httpClient: HttpClient
-): RemoteQuizDataSource {
+) : RemoteQuizDataSource {
 
     override suspend fun getQuizTopics(): Result<List<QuizTopicDto>, DataError> {
         return safeCall<List<QuizTopicDto>> { httpClient.get(urlString = "$BASE_URL/quiz/topics") }
     }
 
-    override suspend fun getQuizQuestions(): Result<List<QuizQuestionDto>, DataError>{
-        return safeCall <List<QuizQuestionDto>>{ httpClient.get(urlString = "$BASE_URL/quiz/questions") }
+    override suspend fun getQuizQuestions(topicCode: Int): Result<List<QuizQuestionDto>, DataError> {
+        return safeCall<List<QuizQuestionDto>> {
+            httpClient.get(urlString = "$BASE_URL/quiz/questions") {
+                parameter("topicCode", topicCode)
+            }
+        }
     }
 
 

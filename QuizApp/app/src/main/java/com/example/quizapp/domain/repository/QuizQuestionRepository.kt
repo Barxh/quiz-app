@@ -5,5 +5,5 @@ import com.example.quizapp.domain.util.DataError
 import com.example.quizapp.domain.util.Result
 
 interface QuizQuestionRepository {
-    suspend fun getQuizQuestions() : Result<List<QuizQuestion>, DataError>
+    suspend fun getQuizQuestions(topicCode: Int) : Result<List<QuizQuestion>, DataError>
 }

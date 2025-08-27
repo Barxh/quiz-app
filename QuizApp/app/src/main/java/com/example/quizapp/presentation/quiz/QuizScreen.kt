@@ -1,5 +1,6 @@
 package com.example.quizapp.presentation.quiz
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.quizapp.domain.model.QuizQuestion
 import com.example.quizapp.domain.model.UserAnswer
@@ -39,14 +41,27 @@ import com.example.quizapp.presentation.quiz.component.QuizScreenLoadingContent
 import com.example.quizapp.presentation.quiz.component.QuizScreenTopBar
 import com.example.quizapp.presentation.quiz.component.QuizSubmitButtons
 import com.example.quizapp.presentation.quiz.component.SubmitQuizDialog
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun QuizScreen(
     state: QuizState,
+    event: Flow<QuizEvent>,
     navigateToDashboardScreen: () -> Unit,
     navigateToResultScreen: () -> Unit,
     onAction: (QuizAction) -> Unit
 ) {
+    val context = LocalContext.current
+
+        LaunchedEffect(key1 = Unit){
+            event.collect { event ->
+                when(event){
+                    is QuizEvent.ShowToast ->{
+                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
 
     SubmitQuizDialog(
         onDialogDismiss = {},

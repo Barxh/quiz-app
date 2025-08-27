@@ -11,10 +11,10 @@ class QuizQuestionRepositoryImpl(
     private val remoteDataSource: KtorRemoteDataSource
 ): QuizQuestionRepository {
 
-    override suspend fun getQuizQuestions(): Result<List<QuizQuestion>, DataError> {
+    override suspend fun getQuizQuestions(topicCode: Int): Result<List<QuizQuestion>, DataError> {
 
 
-        return when(val result = remoteDataSource.getQuizQuestions()){
+        return when(val result = remoteDataSource.getQuizQuestions(topicCode)){
             is Result.Failure -> {
                 result
             }
